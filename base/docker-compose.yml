@@ -5,7 +5,8 @@ services:
     cap_add:
       - NET_ADMIN
     image: kylemanna/openvpn
-    network_mode: host
+    networks:
+      - local
     deploy:
       mode: replicated
       replicas: 1
@@ -16,9 +17,22 @@ services:
         failure_action: rollback
       rollback_config:
         order: start-first
+    ports:
+      - "1195:1194/udp"
+      - "1195:1194"
     volumes:
       - openvpn:/etc/openvpn
 
+
+
+networks:
+  local:
+    name: base
+    driver: overlay
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.10.0/28
 
 volumes:
   openvpn:
