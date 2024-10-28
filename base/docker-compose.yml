@@ -5,7 +5,7 @@ services:
     cap_add:
       - NET_ADMIN
     image: kylemanna/openvpn
-    networks:
+    network_mode: host
     deploy:
       mode: replicated
       replicas: 1
@@ -16,9 +16,6 @@ services:
         failure_action: rollback
       rollback_config:
         order: start-first
-    ports:
-      - "1194:1194/udp"
-      - "1194:1194"
     volumes:
       - openvpn:/etc/openvpn
 
@@ -31,6 +28,8 @@ volumes:
       type: "nfs"
       device: ":/nfs_share/base/open-vpn"
       o: "vers=4,addr=10.0.0.3,rw,soft"
+
+
 
 
 
