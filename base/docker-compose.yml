@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  openvpn:
+    cap_add:
+      - NET_ADMIN
+    image: kylemanna/openvpn
+    networks:
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        order: start-first
+    ports:
+      - "1194:1194/udp"
+      - "1194:1194"
+    volumes:
+      - openvpn:/etc/openvpn
+
+
+volumes:
+  openvpn:
+    name: open-vpn
+    driver: local
+    driver_opts:
+      type: "nfs"
+      device: ":/nfs_share/base/open-vpn"
+      o: "vers=4,addr=10.0.0.3,rw,soft"
+
+
+
+
