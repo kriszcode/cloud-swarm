@@ -25,9 +25,9 @@ volumes:
     name: open-vpn
     driver: local
     driver_opts:
-      type: "nfs"
+      type: nfs
       device: ":/nfs_share/base/open-vpn"
-      o: "vers=4,addr=10.0.0.3,rw,soft"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
 
 
 
