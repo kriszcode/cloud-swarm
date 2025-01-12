@@ -67,7 +67,7 @@ services:
         # That way you can add other internal Traefik instances per stack if needed
         - traefik.constraint-label=traefik
         # IP white list middleware
-        - traefik.http.middlewares.local.ipwhitelist.sourcerange=10.0.0.0/12, 192.168.255.0/24
+        - traefik.http.middlewares.local.ipallowlist.sourcerange=10.0.0.0/12, 192.168.255.0/24
         - traefik.http.middlewares.admin-auth.basicauth.usersfile=/run/secrets/traefik-admin-user
         # traefik frontend
         - traefik.http.routers.traefik-https.rule=Host(`traefik.szabolcsi.dev`)
