@@ -30,6 +30,8 @@ services:
   #-p 127.0.0.1:2375:2375
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy
+    environment:
+      - SERVICES=1
     cap_add:
       - NET_ADMIN
     networks:
