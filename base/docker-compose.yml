@@ -32,6 +32,7 @@ services:
     image: tecnativa/docker-socket-proxy
     environment:
       - SERVICES=1
+      - NETWORKS=1
     cap_add:
       - NET_ADMIN
     networks:
