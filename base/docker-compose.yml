@@ -88,7 +88,7 @@ services:
     secrets:
       - traefik-admin-user
     command:
-      - --providers.swarm.endpoint=tcp://docker-socket-proxy:2377
+      - --providers.swarm.endpoint=tcp://docker-socket-proxy:2375
       - --providers.swarm.exposedByDefault=false
       - --providers.swarm.network=traefik
       # Add a constraint to only use services with the label "traefik.constraint-label=traefik"
