@@ -105,7 +105,7 @@ services:
       - --entrypoints.http.http.redirections.entryPoint.scheme=https
       # Create an entrypoint "https" listening on port 443
       - --entrypoints.https.address=:443
-      - --entryPoints.https.proxyProtocol.trustedIPs=10.0.0.2
+      - --entryPoints.https.proxyProtocol.trustedIPs=10.0.0.0/24,172.35.0.0/24
       - --entrypoints.https.http.encodequerysemicolons=true
       # dynamic config
       - --providers.file.directory=/etc/traefik/dynamic_conf
