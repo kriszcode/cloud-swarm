@@ -73,6 +73,7 @@ services:
         - traefik.http.routers.traefik-https.rule=Host(`traefik.szabolcsi.dev`)
         - traefik.http.routers.traefik-https.entrypoints=https
         - traefik.http.routers.traefik-https.tls=true
+        - traefik.http.routers.traefik-https.tls.certresolver=letsencrypt
         # Use the special Traefik service api@internal with the web UI/Dashboard
         - traefik.http.routers.traefik-https.service=api@internal
         - traefik.http.routers.traefik-https.middlewares=admin-auth,local
