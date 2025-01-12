@@ -6,7 +6,7 @@ services:
       - NET_ADMIN
     image: kylemanna/openvpn
     networks:
-      - local
+      - public
     deploy:
       mode: replicated
       replicas: 1
@@ -131,6 +131,13 @@ services:
 
 
 networks:
+  public:
+    name: base-public
+    driver: overlay
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.30.2.0/24
   local:
     name: base-network
     driver: overlay
