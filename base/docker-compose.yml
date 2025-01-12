@@ -6,7 +6,7 @@ services:
       - NET_ADMIN
     image: kylemanna/openvpn
     networks:
-      - local
+      - host
     deploy:
       mode: replicated
       replicas: 1
@@ -17,22 +17,129 @@ services:
         failure_action: rollback
       rollback_config:
         order: start-first
-    ports:
-      - "1195:1194/udp"
-      - "1195:1194"
+      placement:
+        constraints:
+          - node.role == manager
     volumes:
       - openvpn:/etc/openvpn
 
 
+  #-p 127.0.0.1:2375:2375
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy
+    privileged: true
+    networks:
+      - local
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+
+
+  traefik:
+    image: traefik:v3.3
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+      # Listen on port 443, default for HTTPS
+      - "8443:443"
+      - "8080:80"
+    networks:
+      - traefik
+      - local
+    deploy:
+      labels:
+        # Enable Traefik for this service, to make it available in the public network
+        - traefik.enable=true
+        # Use the custom label "traefik.constraint-label=traefik"
+        # This public Traefik will only use services with this label
+        # That way you can add other internal Traefik instances per stack if needed
+        - traefik.constraint-label=traefik
+        # IP white list middleware
+        - traefik.http.middlewares.local.ipwhitelist.sourcerange=10.0.0.0/12, 192.168.255.0/24
+        - traefik.http.middlewares.admin-auth.basicauth.usersfile=/run/secrets/traefik-admin-user
+        # traefik frontend
+        - traefik.http.routers.traefik-https.rule=Host(`traefik.szabolcsi.dev`)
+        - traefik.http.routers.traefik-https.entrypoints=https
+        - traefik.http.routers.traefik-https.tls=true
+        # Use the special Traefik service api@internal with the web UI/Dashboard
+        - traefik.http.routers.traefik-https.service=api@internal
+        - traefik.http.routers.traefik-https.middlewares=admin-auth,local
+        # Use the "le" (Let's Encrypt) resolver created below
+        - traefik.http.services.traefik.loadbalancer.server.port=8080
+        # Prometheus
+        - traefik.http.routers.traefik-metrics.rule=(Host(`traefik.szabolcsi.dev`) && PathPrefix(`/metrics`))
+        - traefik.http.routers.traefik-metrics.entrypoints=https
+        - traefik.http.routers.traefik-metrics.middlewares=local
+        - traefik.http.routers.traefik-metrics.service=prometheus@internal
+    volumes:
+      # Add Docker as a mounted volume, so that Traefik can read the labels of other services
+      - traefik-certs:/certificates
+      - traefik-config:/etc/traefik/dynamic_conf
+      - traefik-letsencrypt:/letsencrypt
+      # Mount the volume to store the certificates
+    secrets:
+      - traefik-admin-user
+    command:
+      - --providers.swarm.endpoint=tcp://docker-socket-proxy:2377
+      - --providers.swarm.exposedByDefault=false
+      - --providers.swarm.network=traefik
+      # Add a constraint to only use services with the label "traefik.constraint-label=traefik"
+      - --providers.swarm.constraints=Label(`traefik.constraint-label`, `traefik`)
+      # Create an entrypoint "http" listening on port 80
+      - --entrypoints.http.address=:80
+      - --entrypoints.http.http.encodequerysemicolons=true
+      - --entrypoints.http.http.redirections.entryPoint.to=https
+      - --entrypoints.http.http.redirections.entryPoint.scheme=https
+      # Create an entrypoint "https" listening on port 443
+      - --entrypoints.https.address=:443
+      - --entryPoints.https.proxyProtocol.trustedIPs=10.0.0.2
+      - --entrypoints.https.http.encodequerysemicolons=true
+      # dynamic config
+      - --providers.file.directory=/etc/traefik/dynamic_conf
+      - --providers.file.watch=true
+      # Enable the access log, with HTTP requests
+      - --accesslog
+      - --accesslog.fields.names.StartUTC=drop
+      # Acme
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.email=letsencrypt@szabolcsi.eu
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      # Enable Prometheus metrics
+      - --entryPoints.metrics.address=:8082
+      - --metrics.prometheus=true
+      - --metrics.prometheus.addServicesLabels=true
+      - --metrics.prometheus.entryPoint=metrics
+      - --metrics.prometheus.manualrouting=true
+      # Enable the Traefik log, for configurations and errors
+      - --log
+      - --log.level=WARN
+      - --api
+
+
+
 
 networks:
+  host:
+    name: host
+    external: true
   local:
-    name: base
+    name: base-network
     driver: overlay
     internal: true
     ipam:
       config:
-        - subnet: 172.30.10.0/28
+        - subnet: 172.30.6.0/24
+  traefik:
+    name: traefik
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 172.30.8.0/22
+
 
 volumes:
   openvpn:
@@ -42,6 +149,32 @@ volumes:
       type: nfs
       device: ":/nfs_share/base/open-vpn"
       o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  traefik-certificates:
+    name: traefik-certificates
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/base/traefik/certificates"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  traefik-config:
+    name: traefik-config
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/base/traefik/config"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  traefik-letsencrypt:
+    name: traefik-letsencrypt
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/base/traefik/letsencrypt"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+
+secrets:
+  traefik-admin-user:
+    name: ${TRAEFIK_USER_SECRET_NAME}
+    external: true
 
 
 
