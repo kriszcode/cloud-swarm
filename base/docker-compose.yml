@@ -5,8 +5,7 @@ services:
     cap_add:
       - NET_ADMIN
     image: kylemanna/openvpn
-    networks:
-      - host
+    network_mode: "host"
     deploy:
       mode: replicated
       replicas: 1
