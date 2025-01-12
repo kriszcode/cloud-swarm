@@ -27,7 +27,8 @@ services:
   #-p 127.0.0.1:2375:2375
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy
-    privileged: true
+    cap_add:
+      - NET_ADMIN
     networks:
       - local
     volumes:
@@ -77,7 +78,7 @@ services:
         - traefik.http.routers.traefik-metrics.service=prometheus@internal
     volumes:
       # Add Docker as a mounted volume, so that Traefik can read the labels of other services
-      - traefik-certs:/certificates
+      - traefik-certificates:/certificates
       - traefik-config:/etc/traefik/dynamic_conf
       - traefik-letsencrypt:/letsencrypt
       # Mount the volume to store the certificates
