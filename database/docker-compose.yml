@@ -1,0 +1,90 @@
+version: '3.8'
+
+x-traefik-enable-labels: &traefik-labels
+  traefik.enable: "true"
+  traefik.docker.network: "traefik"
+  traefik.constraint-label: "traefik"
+
+
+services:
+  mariadb:
+    image: mariadb:11.7.2-noble
+    networks:
+      - database
+    volumes:
+      - database:/var/lib/mysql
+    environment:
+      - TZ:Europe/Berlin
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    secrets:
+      - mariadb-root
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.mariadb.data == true
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --default-time-zone=Europe/Berlin
+      #default 128M
+      - --innodb_buffer_pool_size=512M
+      #default 48-128M
+      - --innodb_log_file_size=128M
+      #default 8M
+      - --innodb_log_buffer_size=32M
+      #default 1
+      - --innodb_flush_log_at_trx_commit=2
+      #default 151
+      - --max_connections=100
+      - --thread_cache_size=50
+      #default 400
+      - --table_open_cache=400
+      #default 16M
+      - --tmp_table_size=64M
+      #default 16M
+      - --max_heap_table_size=64M
+      - --skip-name-resolve
+      - --bind-address=0.0.0.0
+
+#mariaDb MaxScale -https://hub.docker.com/r/mariadb/maxscale
+
+  adminer:
+    image: adminer:5.2.1-standalone
+    networks:
+      - traefik
+      - database
+    environment:
+      - ADMINER_DEFAULT_SERVER=base_mariadb
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        <<: *traefik-labels
+        traefik.http.routers.adminer.rule: Host(`adminer.szabolcsi.dev`)
+        traefik.http.routers.adminer.entrypoints: https
+        traefik.http.routers.adminer.tls: true
+        traefik.http.routers.traefik-https.tls.certresolver: letsencrypt
+        traefik.http.routers.adminer.middlewares: local
+        traefik.http.services.adminer.loadbalancer.server.port: 8080
+        traefik.http.services.adminer.loadbalancer.healthCheck.path: "/"
+        traefik.http.services.adminer.loadbalancer.healthCheck.interval: "30s"
+        traefik.http.services.adminer.loadbalancer.healthCheck.timeout: "1s"
+
+
+networks:
+  database:
+    name: database
+    driver: overlay
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.13.0/24
+
+volumes:
+  mariadb:
+    name: mariadb
+    driver: local
