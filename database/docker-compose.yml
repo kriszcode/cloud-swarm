@@ -16,8 +16,6 @@ services:
     environment:
       - TZ:Europe/Berlin
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-    secrets:
-      - mariadb-root
     deploy:
       mode: replicated
       replicas: 1
