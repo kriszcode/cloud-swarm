@@ -125,8 +125,27 @@ services:
       - --metrics.prometheus.manualrouting=true
       # Enable the Traefik log, for configurations and errors
       - --log
-      - --log.level=WARN
+      - --log.level=DEBUG
       - --api
+
+#  dns:
+#    image: ubuntu/bind9:9.18-22.04_beta
+#    environment:
+#      - TZ=Europe/Berlin
+#    networks:
+#      - dns
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      restart_policy:
+#        condition: any
+#    ports:
+#      - "53:53"
+#      - "53:53/udp"
+#    volumes:
+#      - dns-config:/etc/bind
+#      - dns-cache:/var/cache/bind
+#      - dns-records:/var/lib/bind
 
 
 
@@ -152,6 +171,27 @@ networks:
 
 
 volumes:
+  #dns-config:
+  #  name: dns-config
+  #  driver: local
+  #  driver_opts:
+  #    type: nfs
+  #    device: ":/nfs_share/base/dns/config"
+  #    o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  #dns-cache:
+  #  name: dns-cache
+  #  driver: local
+  #  driver_opts:
+  #    type: nfs
+  #    device: ":/nfs_share/base/dns/cache"
+  #    o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  #dns-records:
+  #  name: dns-records
+  #  driver: local
+  #  driver_opts:
+  #    type: nfs
+  #    device: ":/nfs_share/base/dns/records"
+  #    o: "addr=10.0.0.3,rw,soft,nfsvers=4"
   openvpn:
     name: open-vpn
     driver: local
