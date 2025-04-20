@@ -103,22 +103,5 @@ volumes:
 
 configs:
   haproxy:
-    name: haproxy-config
-    content: |
-      global
-        log /dev/log	local0
-        log /dev/log	local1 notice
-        user root
-        group root
-        daemon
-      defaults
-        log	global
-        mode	tcp
-        option	tcplog
-        option	dontlognull
-        timeout connect 5000
-        timeout client  50000
-        timeout server  50000
-      listen database
-        bind *:3306
-        server database database_mariadb:3306
+    name: "${HAPROXY_CONFIG_NAME}"
+    external: true
