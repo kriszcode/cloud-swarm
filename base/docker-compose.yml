@@ -68,7 +68,7 @@ services:
         - traefik.constraint-label=traefik
         # IP white list middleware
         - traefik.http.middlewares.local.ipallowlist.sourcerange=10.0.0.0/12, 192.168.255.0/24
-        - traefik.http.middlewares.local.ipwhitelist.ipstrategy.depth=1
+        - traefik.http.middlewares.local.ipwhitelist.ipstrategy.depth=0
         - traefik.http.middlewares.admin-auth.basicauth.usersfile=/run/secrets/traefik-admin-user
         # traefik frontend
         - traefik.http.routers.traefik-https.rule=Host(`traefik.szabolcsi.dev`)
@@ -132,7 +132,7 @@ services:
       - --metrics.prometheus.manualrouting=true
       # Enable the Traefik log, for configurations and errors
       - --log
-      - --log.level=DEBUG
+      - --log.level=WARN
       - --api
 
 #  dns:
