@@ -58,7 +58,7 @@ services:
       - traefik
       - database
     environment:
-      - ADMINER_DEFAULT_SERVER=base_mariadb
+      - ADMINER_DEFAULT_SERVER=database_mariadb
     deploy:
       mode: replicated
       replicas: 1
