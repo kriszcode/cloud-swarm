@@ -40,6 +40,7 @@ services:
       - GITEA__session__PROVIDER=file
     networks:
       - local
+      - traefik
     volumes:
       - gitea:/data
       - /etc/timezone:/etc/timezone:ro
