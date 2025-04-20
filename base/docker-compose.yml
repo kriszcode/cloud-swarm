@@ -85,6 +85,13 @@ services:
         - traefik.http.routers.traefik-metrics.entrypoints=https
         - traefik.http.routers.traefik-metrics.middlewares=local
         - traefik.http.routers.traefik-metrics.service=prometheus@internal
+      update_config:
+        order: "start-first"
+        max_failure_ratio: 2
+        parallelism: 1
+      rollback_config:
+        parallelism: 1
+        order: "start-first"
     volumes:
       # Add Docker as a mounted volume, so that Traefik can read the labels of other services
       - traefik-certificates:/certificates
