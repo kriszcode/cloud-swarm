@@ -2,7 +2,7 @@ version: '3.8'
 
 x-traefik-enable-labels: &traefik-labels
   traefik.enable: "true"
-  traefik.docker.network: "traefik"
+  traefik.swarm.network: "traefik"
   traefik.constraint-label: "traefik"
 
 
