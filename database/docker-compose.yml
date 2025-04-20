@@ -83,6 +83,8 @@ networks:
     ipam:
       config:
         - subnet: 172.30.13.0/24
+  traefik:
+    external: true
 
 volumes:
   mariadb:
