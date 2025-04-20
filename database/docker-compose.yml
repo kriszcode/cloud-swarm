@@ -12,7 +12,7 @@ services:
     networks:
       - database
     volumes:
-      - database:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     environment:
       - TZ:Europe/Berlin
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
