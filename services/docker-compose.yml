@@ -56,9 +56,9 @@ services:
         traefik.http.routers.gitea.tls: "true"
         traefik.http.routers.gitea.tls.certresolver: "letsencrypt"
         traefik.http.services.gitea.loadbalancer.server.port: "3000"
-        traefik.http.services.gitea.loadbalancer.healthCheck.path: "/"
-        traefik.http.services.gitea.loadbalancer.healthCheck.interval: "30s"
-        traefik.http.services.gitea.loadbalancer.healthCheck.timeout: "1s"
+        #traefik.http.services.gitea.loadbalancer.healthCheck.path: "/"
+        #traefik.http.services.gitea.loadbalancer.healthCheck.interval: "30s"
+        #traefik.http.services.gitea.loadbalancer.healthCheck.timeout: "1s"
     
 
   proxy:
