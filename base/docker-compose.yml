@@ -87,7 +87,6 @@ services:
         - traefik.http.routers.traefik-metrics.service=prometheus@internal
       update_config:
         order: "start-first"
-        max_failure_ratio: 2
         parallelism: 1
       rollback_config:
         parallelism: 1
