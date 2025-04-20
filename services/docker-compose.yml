@@ -46,7 +46,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "2222:22"
+      - "222:22"
     deploy:
       replicas: 1
       <<: *api-deployment
