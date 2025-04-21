@@ -18,6 +18,7 @@ jobs:
         id: changed
         run: |
           # Get only changed docker-compose.yml files in top-level folders
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
           CHANGED_COMPOSE_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^[^/]+/docker-compose\.yml$' | cut -d '/' -f1 | sort -u || true)
           echo "::notice title=Changed Files::$CHANGED_COMPOSE_DIRS"
           echo "CHANGED_COMPOSE_DIRS=$CHANGED_COMPOSE_DIRS" >> $GITHUB_ENV
