@@ -33,6 +33,7 @@ services:
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
       - GITEA__server__ROOT_URL=https://gitea.szabolcsi.dev
+      - GITEA__server__START_SSH_SERVER=true
       - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
       - GITEA__service__DISABLE_REGISTRATION=true
       - GITEA__service__DEFAULT_USER_VISIBILITY=private
@@ -60,7 +61,36 @@ services:
         #traefik.http.services.gitea.loadbalancer.healthCheck.path: "/"
         #traefik.http.services.gitea.loadbalancer.healthCheck.interval: "30s"
         #traefik.http.services.gitea.loadbalancer.healthCheck.timeout: "1s"
-    
+
+
+  gitea-runner:
+    image: gitea/act_runner:0.2.11
+    environment:
+      - GITEA_INSTANCE_URL=http://gitea:3000
+      - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN}
+    networks:
+      - local
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitea-runner:/data
+    deploy:
+      replicas: 1
+      mode: replicated
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: stop-first
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+          - node.labels.gitea.runner == true
 
   proxy:
     image: haproxy:3.1.7-alpine
@@ -101,6 +131,9 @@ volumes:
       type: nfs
       device: ":/nfs_share/services/gitea"
       o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  gitea-runner:
+    name: gitea-runner-data
+    driver: local
 
 configs:
   haproxy:
