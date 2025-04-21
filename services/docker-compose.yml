@@ -54,6 +54,7 @@ services:
       <<: *api-deployment
       labels:
         <<: *traefik-labels
+        demo.label: "alma"
         traefik.http.routers.gitea.rule: "Host(`gitea.szabolcsi.dev`)"
         traefik.http.routers.gitea.entrypoints: "https"
         traefik.http.routers.gitea.tls: "true"
