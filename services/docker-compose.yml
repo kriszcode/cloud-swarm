@@ -70,6 +70,7 @@ services:
       - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN}
     networks:
       - local
+      - public
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - gitea-runner:/data
@@ -127,6 +128,9 @@ networks:
   database:
     external: true
   portainer:
+    external: true
+  public:
+    name: base-public
     external: true
 
 volumes:
