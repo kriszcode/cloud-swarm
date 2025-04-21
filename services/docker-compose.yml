@@ -42,6 +42,7 @@ services:
     networks:
       - local
       - traefik
+      - runner
     volumes:
       - gitea:/data
       - /etc/timezone:/etc/timezone:ro
@@ -66,14 +67,18 @@ services:
   gitea-runner:
     image: gitea/act_runner:0.2.11
     environment:
-      - GITEA_INSTANCE_URL=http://gitea:3000
+      - GITEA_INSTANCE_URL=http://services_gitea:3000
       - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN}
+      - CONFIG_FILE=/config.yaml
     networks:
       - local
-      - public
+      - runner
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - gitea-runner:/data
+    configs:
+      - source: gitea_runner
+        target: /config.yaml
     deploy:
       replicas: 1
       mode: replicated
@@ -100,6 +105,9 @@ services:
         aliases:
           - database
           - portainer.szabolcsi.dev
+      runner:
+        aliases:
+          - portainer.szabolcsi.dev
       database:
         aliases:
           - services-proxy
@@ -123,15 +131,21 @@ networks:
     ipam:
       config:
         - subnet: 172.30.14.0/24
+  runner:
+    name: gitea-runner
+    driver: overlay
+    internal: false
+    attachable: true
+    ipam:
+      config:
+        - subnet: 172.30.15.0/24
   traefik:
     external: true
   database:
     external: true
   portainer:
     external: true
-  public:
-    name: base-public
-    external: true
+
 
 volumes:
   gitea:
@@ -148,4 +162,7 @@ volumes:
 configs:
   haproxy:
     name: "${HAPROXY_CONFIG_NAME}"
+    external: true
+  gitea_runner:
+    name: "${GITEA_RUNNER_CONFIG_NAME}"
     external: true
