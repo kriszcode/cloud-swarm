@@ -35,7 +35,7 @@ jobs:
           
             if [ "$STACK_ID" != "null" ]; then
               echo "::notice title=Updating Portainer stack::$dir (ID: $STACK_ID)..."
-              curl -X POST "http://portainer.szabolcsi.dev/api/stacks/webhooks/$STACK_ID"
+              curl -v -X POST "http://portainer.szabolcsi.dev/api/stacks/webhooks/$STACK_ID"
             else
               echo "::notice title=No stack ID found for::$dir, skipping."
             fi
