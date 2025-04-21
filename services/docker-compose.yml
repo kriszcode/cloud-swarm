@@ -98,9 +98,13 @@ services:
       local:
         aliases:
           - database
+          - portainer.szabolcsi.dev
       database:
         aliases:
           - services-proxy
+      portainer:
+        aliases:
+          - service-proxy
     configs:
       - source: haproxy
         target: /usr/local/etc/haproxy/haproxy.cfg
@@ -121,6 +125,8 @@ networks:
   traefik:
     external: true
   database:
+    external: true
+  portainer:
     external: true
 
 volumes:
