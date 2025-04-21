@@ -33,7 +33,7 @@ services:
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
       - GITEA__server__ROOT_URL=https://gitea.szabolcsi.dev
-      - GITEA__server__START_SSH_SERVER=true
+      - GITEA__server__START_SSH_SERVER=false
       - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
       - GITEA__service__DISABLE_REGISTRATION=true
       - GITEA__service__DEFAULT_USER_VISIBILITY=private
