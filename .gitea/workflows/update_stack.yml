@@ -18,12 +18,13 @@ jobs:
         id: changed
         run: |
           # Get only changed docker-compose.yml files in top-level folders
-          CHANGED_COMPOSE_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^[^/]+/docker-compose\.yml$' | cut -d '/' -f1 | sort -u)
-
+          CHANGED_COMPOSE_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^[^/]+/docker-compose\.yml$' | cut -d '/' -f1 | sort -u || true)
           echo "CHANGED_COMPOSE_DIRS=$CHANGED_COMPOSE_DIRS" >> $GITHUB_ENV
 
       - name: Update relevant stacks in Portainer
+        if: env.CHANGED_COMPOSE_DIRS != ''
         run: |
+          echo "Van változás, frissítünk!"
           echo "Reading stack mapping..."
           STACK_MAP=$(cat .stack-map.json)
 
