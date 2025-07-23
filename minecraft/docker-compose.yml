@@ -1,0 +1,75 @@
+version: '3.8'
+
+x-traefik-enable-labels: &traefik-labels
+  traefik.enable: "true"
+  traefik.swarm.network: "traefik"
+  traefik.constraint-label: "traefik"
+
+x-api-deploy: &api-deployment
+  mode: replicated
+  update_config:
+    parallelism: 1
+    delay: 5s
+    order: start-first
+    failure_action: rollback
+  rollback_config:
+    order: start-first
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+    window: 120s
+
+services:
+  #https://github.com/itzg/docker-minecraft-bedrock-server
+  normal:
+    image: itzg/minecraft-bedrock-server
+    environment:
+      #https://minecraft.wiki/w/Server.properties#Option_keys
+      EULA: "true"
+      TZ: "Europe/Berlin"
+      SERVER_NAME: "FreundeLand"
+      GAMEMODE: "survival"
+      DIFFICULTY: "normal"
+      #Craftopia
+      LEVEL_NAME: "GrünesTal"
+      LEVEL_SEED: "-7648232739738869036"
+      VIEW_DISTANCE: 10
+      PLAYER_IDLE_TIMEOUT: 15
+      ENFORCE_WHITELIST: "true"
+      WHITELIST: "TaxingTie2147"
+      ONLINE_MODE: "true"
+      #http_proxy: "http://proxy.yourdomain.local:3128"
+      #https_proxy: "http://proxy.yourdomain.local:3128"
+    ports:
+      - target: 19132
+        published: 19132
+        protocol: udp
+        mode: host
+    networks:
+      - local
+    volumes:
+      - normal:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.minecraft == data
+
+
+volumes:
+  normal:
+    name: minecraft-normal-data
+    driver: local
+
+networks:
+  local:
+    name: minecraft
+    driver: overlay
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.30.16.0/24
