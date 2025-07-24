@@ -79,7 +79,7 @@ services:
       VIEW_DISTANCE: 10
       PLAYER_IDLE_TIMEOUT: 15
       ENFORCE_WHITELIST: "true"
-      WHITE_LIST: ""
+      WHITE_LIST: ${USER_WHITELIST}
       ONLINE_MODE: "true"
       ENABLE_RCON: "true"
       RCON_PASSWORD: ${RCON_PASS}
