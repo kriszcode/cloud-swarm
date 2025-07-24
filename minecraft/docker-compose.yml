@@ -65,10 +65,62 @@ services:
       placement:
         constraints:
           - node.labels.minecraft == data
+  java:
+    image: itzg/minecraft-server
+    environment:
+      #https://minecraft.wiki/w/Server.properties#Option_keys
+      EULA: "TRUE"
+      TZ: "Europe/Berlin"
+      MOTD: "Willkommen in FreundeLand"
+      LEVEL_NAME: "GruenesTal"
+      LEVEL_SEED: "-7648232739738869036"
+      GAMEMODE: "survival"
+      DIFFICULTY: "normal"
+      VIEW_DISTANCE: 10
+      PLAYER_IDLE_TIMEOUT: 15
+      ENFORCE_WHITELIST: "TRUE"
+      WHITELIST: ${USER_WHITELIST}
+      ONLINE_MODE: "TRUE"
+      ENABLE_RCON: "true"
+      RCON_PASSWORD: ${RCON_PASS}
+      RCON_PORT: "25575"
+      VERSION: "1.20.1"
+      TYPE: "FORGE"
+    ports:
+      - target: 25565
+        published: 25565
+        protocol: udp
+        mode: host
+      - target: 25575
+        published: 25575
+        protocol: tcp
+        mode: host
+    networks:
+      - local
+    volumes:
+      - java:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: stop-first
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.minecraft == data
 
 volumes:
   normal:
     name: minecraft-normal-data
+    driver: local
+  java:
+    name: minecraft-normal-java
     driver: local
 
 networks:
