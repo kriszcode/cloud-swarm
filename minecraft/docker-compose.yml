@@ -37,7 +37,7 @@ services:
       VIEW_DISTANCE: 10
       PLAYER_IDLE_TIMEOUT: 15
       ENFORCE_WHITELIST: "true"
-      WHITELIST: "TaxingTie2147"
+      WHITELIST: ${USER_WHITELIST}
       ONLINE_MODE: "true"
       #http_proxy: "http://proxy.yourdomain.local:3128"
       #https_proxy: "http://proxy.yourdomain.local:3128"
