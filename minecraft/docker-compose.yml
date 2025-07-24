@@ -69,7 +69,7 @@ services:
     image: itzg/minecraft-server
     environment:
       #https://minecraft.wiki/w/Server.properties#Option_keys
-      EULA: "TRUE"
+      EULA: "true"
       TZ: "Europe/Berlin"
       MOTD: "Willkommen in FreundeLand"
       LEVEL_NAME: "GruenesTal"
@@ -78,9 +78,9 @@ services:
       DIFFICULTY: "normal"
       VIEW_DISTANCE: 10
       PLAYER_IDLE_TIMEOUT: 15
-      ENFORCE_WHITELIST: "TRUE"
+      ENFORCE_WHITELIST: "true"
       WHITELIST: ${USER_WHITELIST}
-      ONLINE_MODE: "TRUE"
+      ONLINE_MODE: "true"
       ENABLE_RCON: "true"
       RCON_PASSWORD: ${RCON_PASS}
       RCON_PORT: "25575"
