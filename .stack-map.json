@@ -1,3 +1,6 @@
 {
-  "services": "2ae30044-09a7-4a9d-b8c5-451f177854c8"
+  "services": "2ae30044-09a7-4a9d-b8c5-451f177854c8",
+  "base" : "ca135cac-2f45-4002-8112-6bad6cde7e27",
+  "database" : "65644ed0-5a64-43f4-9fa1-a52f90f6125f",
+  "minecraft": "46160c58-76fe-4ff0-b1de-80b08310917c"
 }
