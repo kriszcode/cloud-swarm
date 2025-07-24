@@ -53,12 +53,18 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: stop-first
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
       restart_policy:
         condition: any
       placement:
         constraints:
           - node.labels.minecraft == data
-
 
 volumes:
   normal:
