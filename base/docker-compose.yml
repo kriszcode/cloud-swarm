@@ -112,6 +112,9 @@ services:
       - --entrypoints.http.http.redirections.entryPoint.scheme=https
       # Create an entrypoint "https" listening on port 443
       - --entrypoints.https.address=:443
+      - --entrypoints.https.transport.respondingTimeouts.readTimeout=600s
+      - --entrypoints.https.transport.respondingTimeouts.idleTimeout=600s
+      - --entrypoints.https.transport.respondingTimeouts.writeTimeout=600s
       - --entryPoints.https.proxyProtocol.trustedIPs=10.0.0.0/24,172.35.0.0/24,192.168.255.0/24,172.30.0.0/16
       - --entrypoints.https.http.encodequerysemicolons=true
       # dynamic config
