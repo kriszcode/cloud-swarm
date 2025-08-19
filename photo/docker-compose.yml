@@ -1,0 +1,158 @@
+version: '3.8'
+
+x-traefik-enable-labels: &traefik-labels
+  traefik.enable: "true"
+  traefik.swarm.network: "traefik"
+  traefik.constraint-label: "traefik"
+
+x-api-deploy: &api-deployment
+  mode: replicated
+  update_config:
+    parallelism: 1
+    delay: 5s
+    order: stop-first
+    failure_action: rollback
+  rollback_config:
+    order: stop-first
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+    window: 120s
+
+services:
+  immich:
+    image: ghcr.io/immich-app/immich-server:v1.138.1
+    networks:
+      - local
+      - traefik
+      - public
+    environment:
+      - TZ=Europe/Berlin
+      - NO_COLOR=true
+      - IMMICH_LOG_LEVEL=log
+      - DB_HOSTNAME=database
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD_FILE=/run/secrets/db_password
+      - DB_DATABASE_NAME=immich
+      - REDIS_HOSTNAME=redis
+      - REDIS_PORT=6379
+    secrets:
+      - db_password
+    volumes:
+      - data:/data
+      - thumbnail:/data/thumbs
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      replicas: 1
+      <<: *api-deployment
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+      placement:
+        constraints:
+          - node.labels.immich == thumbnail
+      labels:
+        <<: *traefik-labels
+        traefik.http.routers.gitea.rule: "Host(`photo.szabolcsi.eu`)"
+        traefik.http.routers.gitea.entrypoints: "https"
+        traefik.http.routers.gitea.tls: "true"
+        traefik.http.routers.gitea.tls.certresolver: "letsencrypt"
+        traefik.http.services.gitea.loadbalancer.server.port: "2283"
+
+  machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:v1.138.1
+    networks:
+      - local
+      - public
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - cache:/cache
+    deploy:
+      replicas: 1
+      <<: *api-deployment
+      resources:
+        limits:
+          memory: 4G  # ML modellek több memóriát igényelhetnek
+          cpus: '4'
+        reservations:
+          memory: 1G
+          cpus: '1'
+      placement:
+        constraints:
+          - node.labels.immich == model-cache
+
+
+  proxy:
+    image: haproxy:3.1.7-alpine
+    networks:
+      local:
+        aliases:
+          - redis
+          - database
+      services:
+        aliases:
+          - photo-haproxy
+      database:
+        aliases:
+          - photo-haproxy
+    configs:
+      - source: haproxy
+        target: /usr/local/etc/haproxy/haproxy.cfg
+    deploy:
+      replicas: 1
+      <<: *api-deployment
+
+
+networks:
+  local:
+    name: immich
+    driver: overlay
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.17.0/24
+  traefik:
+    external: true
+  services:
+    external: true
+  public:
+    name: base-public
+    external: true
+  database:
+    external: true
+
+
+volumes:
+  database:
+    name: immich-database
+    driver: local
+  data:
+    name: immich-data
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/photo/data"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  thumbnail:
+    name: immich-thumbnail
+    driver: local
+  cache:
+    name: immich-model-cache
+    driver: local
+
+configs:
+  haproxy:
+    name: "${HAPROXY_CONFIG_NAME}"
+    external: true
+
+secrets:
+  db_password:
+    name: postgres-password
+    external: true
+
