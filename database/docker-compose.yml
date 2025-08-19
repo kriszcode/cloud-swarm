@@ -50,6 +50,46 @@ services:
 
 #mariaDb MaxScale -https://hub.docker.com/r/mariadb/maxscale
 
+  postgres:
+    image: ghcr.io/immich-app/postgres:15-vectorchord0.4.2-pgvectors0.3.0
+    networks:
+      - database
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+      TZ: Europe/Berlin
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - type: tmpfs
+        target: /dev/shm
+        tmpfs:
+          size: 134217728
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: stop-first
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+        reservations:
+          memory: 1G
+          cpus: '1'
+      placement:
+        constraints:
+          - node.labels.postgres == true
+
+
   adminer:
     image: adminer:5.2.1-standalone
     networks:
@@ -88,3 +128,11 @@ volumes:
   mariadb:
     name: mariadb
     driver: local
+  postgres:
+    name: postgres
+    driver: local
+
+secrets:
+  postgres_password:
+    name: postgres-password
+    external: true
