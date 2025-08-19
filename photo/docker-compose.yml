@@ -58,11 +58,11 @@ services:
           - node.labels.immich == thumbnail
       labels:
         <<: *traefik-labels
-        traefik.http.routers.gitea.rule: "Host(`photo.szabolcsi.eu`)"
-        traefik.http.routers.gitea.entrypoints: "https"
-        traefik.http.routers.gitea.tls: "true"
-        traefik.http.routers.gitea.tls.certresolver: "letsencrypt"
-        traefik.http.services.gitea.loadbalancer.server.port: "2283"
+        traefik.http.routers.immich.rule: "Host(`photo.szabolcsi.eu`)"
+        traefik.http.routers.immich.entrypoints: "https"
+        traefik.http.routers.immich.tls: "true"
+        traefik.http.routers.immich.tls.certresolver: "letsencrypt"
+        traefik.http.services.immich.loadbalancer.server.port: "2283"
 
   machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:v1.138.1
