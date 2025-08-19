@@ -222,7 +222,6 @@ services:
       - DUPLICATI__WEBSERVICE_PASSWORD=${DUPLICATI_PASSWORD}
       - DUPLICATI__DISABLE_DB_ENCRYPTION=true
     volumes:
-      - nfs:/nfs
       - duplicati-data:/data
     networks:
       - local
@@ -277,13 +276,6 @@ volumes:
     driver: local
   redis-data:
     driver: local
-  nfs:
-    name: nfs-share
-    driver: local
-    driver_opts:
-      type: nfs
-      device: ":/nfs_share"
-      o: "addr=10.0.0.3,ro,soft,nfsvers=4"
   duplicati-data:
     name: duplicati-data
     driver: local
