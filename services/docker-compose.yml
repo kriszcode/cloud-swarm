@@ -219,10 +219,12 @@ services:
   duplicati:
     image: duplicati/duplicati:2.1.1.101-canary
     environment:
+      - TZ=Europe/Berlin
       - DUPLICATI__WEBSERVICE_PASSWORD=${DUPLICATI_PASSWORD}
       - DUPLICATI__DISABLE_DB_ENCRYPTION=true
-      - DUPLICATI__WEBSERVICE_INTERFACE=*
-      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=*
+      - DUPLICATI__WEBSERVICE_INTERFACE=any
+      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=duplicati.szabolcsi.dev
+      - DUPLICATI__WEBSERVICE_TIMEZONE=Europe/Berlin
     volumes:
       - duplicati-data:/data
       - type: volume
