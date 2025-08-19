@@ -221,7 +221,8 @@ services:
     environment:
       - DUPLICATI__WEBSERVICE_PASSWORD=${DUPLICATI_PASSWORD}
       - DUPLICATI__DISABLE_DB_ENCRYPTION=true
-      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=duplicati.szabolcsi.dev
+      - DUPLICATI__WEBSERVICE_INTERFACE=*
+      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=*
     volumes:
       - duplicati-data:/data
       - type: volume
