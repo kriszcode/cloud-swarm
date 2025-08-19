@@ -221,8 +221,15 @@ services:
     environment:
       - DUPLICATI__WEBSERVICE_PASSWORD=${DUPLICATI_PASSWORD}
       - DUPLICATI__DISABLE_DB_ENCRYPTION=true
+      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=duplicati.szabolcsi.dev
     volumes:
       - duplicati-data:/data
+      - type: volume
+        source: immich-data
+        target: /backup/immich_data
+        volume:
+          nocopy: true
+        read_only: true
     networks:
       - local
       - traefik
@@ -283,6 +290,9 @@ volumes:
       type: nfs
       device: ":/nfs_share/services/duplicati"
       o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  immich-data:
+    name: immich-data
+    external: true
 
 
 configs:
