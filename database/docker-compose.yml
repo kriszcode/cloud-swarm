@@ -57,6 +57,7 @@ services:
     environment:
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_USER: root
       TZ: Europe/Berlin
     secrets:
       - postgres_password
@@ -95,8 +96,6 @@ services:
     networks:
       - traefik
       - database
-    environment:
-      - ADMINER_DEFAULT_SERVER=database_mariadb
     deploy:
       mode: replicated
       replicas: 1
@@ -129,7 +128,7 @@ volumes:
     name: mariadb
     driver: local
   postgres:
-    name: postgres
+    name: postgresdb
     driver: local
 
 secrets:
