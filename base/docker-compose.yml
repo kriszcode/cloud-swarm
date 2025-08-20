@@ -157,6 +157,46 @@ services:
 #      - dns-cache:/var/cache/bind
 #      - dns-records:/var/lib/bind
 
+  swarm-cronjob:
+    image: crazymax/swarm-cronjob:1.14.0
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "TZ=Europe/Berlin"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: "stop-first"
+        parallelism: 1
+      rollback_config:
+        parallelism: 1
+        order: "stop-first"
+      resources:
+        limits:
+          cpus: '0.25'
+      placement:
+        constraints:
+          - node.role == manager
+
+  prune-nodes:
+    image: docker:27.3.1-alpine3.20
+    command: [ "docker", "system", "prune", "-af" ]
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+      mode: global
+      labels:
+        - swarm.cronjob.enable=true
+        - swarm.cronjob.schedule=0 0 * * * *
+        - swarm.cronjob.skip-running=true
+      restart_policy:
+        condition: none
 
 
 
