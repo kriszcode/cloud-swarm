@@ -125,7 +125,7 @@ services:
   rclone-sync:
     image: rclone/rclone:latest
     entrypoint: ""
-    command: /bin/sh -c 'rclone sync /data GDrive:Backups/immich/full_backup --backup-dir=GDrive:Backups/immich/archive/$(date +%Y-%m-%d) --progress'
+    command: /bin/sh -c 'rclone sync /data GDrive:Backups/immich/full_backup --backup-dir=GDrive:Backups/immich/archive/$$(date +%Y-%m-%d) --progress'
     networks:
       - public
     volumes:
