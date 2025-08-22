@@ -126,6 +126,8 @@ services:
     image: rclone/rclone:latest
     entrypoint: ""
     command: /bin/sh -c 'rclone sync /data GDrive:Backups/immich/full_backup --backup-dir=GDrive:Backups/immich/archive/$(date +%Y-%m-%d) --progress'
+    networks:
+      - public
     volumes:
       - data:/data:ro
     secrets:
@@ -143,6 +145,8 @@ services:
   rclone-cleanup:
     image: rclone/rclone:latest
     command: delete GDrive:Backups/immich/archive --min-age 60d --rmdirs --progress --dry-run
+    networks:
+      - public
     volumes:
       - data:/data:ro
     secrets:
