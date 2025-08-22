@@ -130,9 +130,7 @@ services:
       - public
     volumes:
       - data:/data:ro
-    secrets:
-      - source: rclone-config
-        target: /config/rclone/rclone.conf
+      - rclone-config:/config/rclone
     environment:
       - TZ=Europe/Budapest
     deploy:
@@ -149,9 +147,7 @@ services:
       - public
     volumes:
       - data:/data:ro
-    secrets:
-      - source: rclone-config
-        target: /config/rclone/rclone.conf
+      - rclone-config:/config/rclone
     environment:
       - TZ=Europe/Budapest
     deploy:
@@ -198,6 +194,13 @@ volumes:
   cache:
     name: immich-model-cache
     driver: local
+  rclone-config:
+    name: rclone-config
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/rclone"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
 
 configs:
   haproxy:
