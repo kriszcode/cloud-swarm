@@ -192,12 +192,25 @@ services:
           cpus: '0.25'
       mode: global
       labels:
-        - swarm.cronjob.enable=true
-        - swarm.cronjob.schedule=0 0 * * * *
-        - swarm.cronjob.skip-running=true
+        swarm.cronjob.enable: "true"
+        swarm.cronjob.schedule: "0 1 * * *"
+        swarm.cronjob.skip-running: "true"
       restart_policy:
         condition: none
 
+  prune-anon-volumes:
+    image: docker:27.3.1-alpine3.20
+    command: sh -c "docker volume ls -q -f dangling=true | grep -E '^[0-9a-f]{12,}$$' | xargs -r docker volume rm"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+      labels:
+        swarm.cronjob.enable: "false"
+        swarm.cronjob.skip-running: "true"
+        swarm.cronjob.schedule: "0 4 * * *"
+      restart_policy:
+        condition: none
 
 
 networks:
