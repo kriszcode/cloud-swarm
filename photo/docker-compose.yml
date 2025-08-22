@@ -125,7 +125,7 @@ services:
   rclone-sync:
     image: rclone/rclone:latest
     entrypoint: [/bin/sh]
-    command: -c 'tail -f /var/log/syslog'
+    command: -c 'tail -f /dev/null'
     #command: -c 'rclone sync /data GDrive:Backups/immich/full_backup --backup-dir=GDrive:Backups/immich/archive/$$(date +%Y-%m-%d) --progress'
     networks:
       - public
