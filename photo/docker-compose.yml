@@ -136,9 +136,9 @@ services:
     deploy:
       <<: *cron-deploy
       labels:
-        swarm.cronjob.enable: "false"
+        swarm.cronjob.enable: "true"
         swarm.cronjob.skip-running: "true"
-        swarm.cronjob.schedule: "0 2 * * *"
+        swarm.cronjob.schedule: "0 3 * * *"
 
   rclone-cleanup:
     image: rclone/rclone:latest
