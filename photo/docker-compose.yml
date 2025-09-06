@@ -140,6 +140,23 @@ services:
         swarm.cronjob.skip-running: "true"
         swarm.cronjob.schedule: "0 3 * * *"
 
+
+  rclone-test:
+    image: rclone/rclone:latest
+    command: ls GDrive:Backups/immich/archive
+    networks:
+      - public
+    volumes:
+      - rclone-config:/config/rclone
+    environment:
+      - TZ=Europe/Budapest
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: none
+
+
   rclone-cleanup:
     image: rclone/rclone:latest
     command: delete GDrive:Backups/immich/archive --min-age 60d --rmdirs --progress --dry-run
