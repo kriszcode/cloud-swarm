@@ -143,7 +143,7 @@ services:
 
   rclone-test:
     image: rclone/rclone:latest
-    command: ls GDrive:immich/archive --drive-root-folder-id 1EGLuWVD5dS2dGoc7QEnJIp61krN1OsiN
+    command: lsd GDrive:immich/archive
     networks:
       - public
     volumes:
