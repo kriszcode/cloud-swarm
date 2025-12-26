@@ -161,7 +161,7 @@ services:
     command: php -S  0.0.0.0:80 main.php
     volumes:
       - traefik-config:/usr/src/app/config
-    config:
+    configs:
       - traefik-config:/usr/src/app/main.php
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/main.php"]
