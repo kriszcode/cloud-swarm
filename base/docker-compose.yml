@@ -162,7 +162,8 @@ services:
     volumes:
       - traefik-config:/usr/src/app/config
     configs:
-      - traefik-config:/usr/src/app/main.php
+      - source: traefik-config
+        target: /usr/src/app/main.php
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/main.php"]
       interval: 1m30s
