@@ -1,0 +1,17 @@
+http:
+  routers:
+    vpn-cert:
+      rule: "Host(`vpn.szabolcsi.eu`)"
+      service: noop@internal
+      entryPoints:
+        - https
+      tls:
+        certResolver: letsencrypt
+    szabolcsi:
+      rule: "Host(`szabolcsi.eu`)"
+      service: noop@internal
+      entryPoints:
+        - https
+      tls:
+        certResolver: letsencrypt
+

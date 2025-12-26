@@ -1,5 +1,20 @@
 version: '3.8'
 
+x-api-deploy: &api-deployment
+  mode: replicated
+  update_config:
+    parallelism: 1
+    delay: 5s
+    order: start-first
+    failure_action: rollback
+  rollback_config:
+    order: start-first
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+    window: 120s
+
 services:
   openvpn:
     cap_add:
@@ -94,7 +109,6 @@ services:
     volumes:
       # Add Docker as a mounted volume, so that Traefik can read the labels of other services
       - traefik-certificates:/certificates
-      - traefik-config:/etc/traefik/dynamic_conf
       - traefik-letsencrypt:/letsencrypt
       # Mount the volume to store the certificates
     secrets:
@@ -118,8 +132,8 @@ services:
       - --entryPoints.https.proxyProtocol.trustedIPs=10.0.0.0/24,172.35.0.0/24,192.168.255.0/24,172.30.0.0/16
       - --entrypoints.https.http.encodequerysemicolons=true
       # dynamic config
-      - --providers.file.directory=/etc/traefik/dynamic_conf
-      - --providers.file.watch=true
+      - --providers.http.endpoint=http://traefik-config/main.php
+      - --providers.http.pollInterval=15s
       # Enable the access log, with HTTP requests
       - --accesslog
       - --accesslog.fields.names.StartUTC=drop
@@ -137,6 +151,29 @@ services:
       - --log
       - --log.level=WARN
       - --api
+
+
+  traefik-config:
+    image: php:8.4-alpine3.22
+    networks:
+      - local
+    working_dir: /usr/src/app
+    command: php -S  0.0.0.0:80 main.php
+    volumes:
+      - traefik-config:/usr/src/app/config
+    config:
+      - traefik-config:/usr/src/app/main.php
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/main.php"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+    deploy:
+      replicas: 1
+      <<: *api-deployment
+
 
 #  dns:
 #    image: ubuntu/bind9:9.18-22.04_beta
@@ -287,6 +324,11 @@ volumes:
 secrets:
   traefik-admin-user:
     name: ${TRAEFIK_USER_SECRET_NAME}
+    external: true
+
+configs:
+  traefik-config:
+    name: ${TRAEFIK_DYNAMIC_CONFIG_NAME}
     external: true
 
 
