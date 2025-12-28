@@ -23,7 +23,7 @@ x-api-deploy: &api-deployment
 services:
   crafty:
     container_name: crafty_container
-    image: registry.gitlab.com/crafty-controller/crafty-4:4.7.0
+    image: arcadiatechnology/crafty-4:4.7.0
     environment:
       - TZ=Europe/Berlin
     networks:
@@ -84,7 +84,7 @@ services:
       traefik.http.routers.immcraftyich.tls: "true"
       traefik.http.routers.crafty.tls.certresolver: "letsencrypt"
       traefik.http.routers.crafty.middlewares: "local"
-      traefik.http.services.crafty.loadbalancer.server.port: "8443"
+      traefik.http.services.crafty.loadbalancer.server.port: "8000"
 
 
   #https://github.com/itzg/docker-minecraft-bedrock-server
