@@ -86,7 +86,7 @@ services:
         traefik.http.routers.crafty.middlewares: "local"
         traefik.http.services.crafty.loadbalancer.server.port: "8443"
         traefik.http.services.crafty.loadbalancer.server.scheme: "https"
-        #traefik.http.services.crafty.loadbalancer.serverstransport: "crafty"
+        traefik.http.services.crafty.loadbalancer.serverstransport: "crafty@http"
 
 
   #https://github.com/itzg/docker-minecraft-bedrock-server
