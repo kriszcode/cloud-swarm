@@ -36,8 +36,24 @@ services:
         protocol: udp
         mode: host
       #MC SERV PORT RANGE
-      - target: "25500-25550"
-        published: "25500-25550"
+      - target: 25500
+        published: 25500
+        protocol: tcp
+        mode: host
+      - target: 25501
+        published: 25501
+        protocol: tcp
+        mode: host
+      - target: 25502
+        published: 25502
+        protocol: tcp
+        mode: host
+      - target: 25503
+        published: 25503
+        protocol: tcp
+        mode: host
+      - target: 25504
+        published: 25504
         protocol: tcp
         mode: host
     volumes:
