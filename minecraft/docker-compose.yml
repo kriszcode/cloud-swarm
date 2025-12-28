@@ -77,14 +77,14 @@ services:
       placement:
         constraints:
           - node.labels.minecraft == data
-    labels:
-      <<: *traefik-labels
-      traefik.http.routers.crafty.rule: "Host(`crafty.szabolcsi.dev`)"
-      traefik.http.routers.crafty.entrypoints: "https"
-      traefik.http.routers.crafty.tls: "true"
-      traefik.http.routers.crafty.tls.certresolver: "letsencrypt"
-      traefik.http.routers.crafty.middlewares: "local"
-      traefik.http.services.crafty.loadbalancer.server.port: "8000"
+      labels:
+        <<: *traefik-labels
+        traefik.http.routers.crafty.rule: "Host(`crafty.szabolcsi.dev`)"
+        traefik.http.routers.crafty.entrypoints: "https"
+        traefik.http.routers.crafty.tls: "true"
+        traefik.http.routers.crafty.tls.certresolver: "letsencrypt"
+        traefik.http.routers.crafty.middlewares: "local"
+        traefik.http.services.crafty.loadbalancer.server.port: "8000"
 
 
   #https://github.com/itzg/docker-minecraft-bedrock-server
