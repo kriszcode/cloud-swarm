@@ -21,84 +21,31 @@ x-api-deploy: &api-deployment
     window: 120s
 
 services:
-  #https://github.com/itzg/docker-minecraft-bedrock-server
-  normal:
-    image: itzg/minecraft-bedrock-server
+  crafty:
+    container_name: crafty_container
+    image: registry.gitlab.com/crafty-controller/crafty-4:4.7.0
     environment:
-      #https://minecraft.wiki/w/Server.properties#Option_keys
-      EULA: "true"
-      TZ: "Europe/Berlin"
-      SERVER_NAME: "FreundeLand"
-      GAMEMODE: "survival"
-      DIFFICULTY: "normal"
-      #Craftopia
-      LEVEL_NAME: "GrünesTal"
-      LEVEL_SEED: "-7648232739738869036"
-      VIEW_DISTANCE: 10
-      PLAYER_IDLE_TIMEOUT: 15
-      ENFORCE_WHITELIST: "true"
-      WHITELIST: ${USER_WHITELIST}
-      ONLINE_MODE: "true"
-      #http_proxy: "http://proxy.yourdomain.local:3128"
-      #https_proxy: "http://proxy.yourdomain.local:3128"
+      - TZ=Europe/Berlin
+    networks:
+      - traefik
+      - local
     ports:
+      #BEDROCK
       - target: 19132
         published: 19132
         protocol: udp
         mode: host
-    networks:
-      - local
-    volumes:
-      - normal:/data
-    deploy:
-      mode: replicated
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 5s
-        order: stop-first
-        failure_action: rollback
-      rollback_config:
-        order: stop-first
-      restart_policy:
-        condition: any
-      placement:
-        constraints:
-          - node.labels.minecraft == data
-  java:
-    image: itzg/minecraft-server
-    environment:
-      #https://minecraft.wiki/w/Server.properties#Option_keys
-      EULA: "true"
-      TZ: "Europe/Berlin"
-      MOTD: "Willkommen in FreundeLand"
-      LEVEL_NAME: "GruenesTal"
-      LEVEL_SEED: "-7648232739738869036"
-      GAMEMODE: "survival"
-      DIFFICULTY: "normal"
-      VIEW_DISTANCE: 10
-      PLAYER_IDLE_TIMEOUT: 15
-      ENFORCE_WHITELIST: "true"
-      WHITE_LIST: "true"
-      ONLINE_MODE: "true"
-      ENABLE_RCON: "true"
-      RCON_PASSWORD: ${RCON_PASS}
-      RCON_PORT: "25575"
-      VERSION: "1.20.1"
-      TYPE: "FORGE"
-    ports:
-      - target: 25565
-        published: 25565
-        protocol: udp
-        mode: host
-      - target: 25575
-        published: 25575
+      #MC SERV PORT RANGE
+      - target: "25500-25550"
+        published: "25500-25550"
         protocol: tcp
         mode: host
-    networks:
-      - local
     volumes:
-      - java:/data
+      - crafty-backups:/crafty/backups
+      - crafty-logs:/crafty/logs
+      - crafty-servers:/crafty/servers
+      - crafty-config:/crafty/app/config
+      - crafty-import:/crafty/import
     deploy:
       mode: replicated
       replicas: 1
@@ -114,14 +61,148 @@ services:
       placement:
         constraints:
           - node.labels.minecraft == data
+    labels:
+      <<: *traefik-labels
+      traefik.http.routers.crafty.rule: "Host(`crafty.szabolcsi.dev`)"
+      traefik.http.routers.crafty.entrypoints: "https"
+      traefik.http.routers.immcraftyich.tls: "true"
+      traefik.http.routers.crafty.tls.certresolver: "letsencrypt"
+      traefik.http.routers.crafty.middlewares: "local"
+      traefik.http.services.crafty.loadbalancer.server.port: "8443"
+
+
+  #https://github.com/itzg/docker-minecraft-bedrock-server
+  #normal:
+  #  image: itzg/minecraft-bedrock-server
+  #  environment:
+  #    #https://minecraft.wiki/w/Server.properties#Option_keys
+  #    EULA: "true"
+  #    TZ: "Europe/Berlin"
+  #    SERVER_NAME: "FreundeLand"
+  #    GAMEMODE: "survival"
+  #    DIFFICULTY: "normal"
+  #    #Craftopia
+  #    LEVEL_NAME: "GrünesTal"
+  #    LEVEL_SEED: "-7648232739738869036"
+  #    VIEW_DISTANCE: 10
+  #    PLAYER_IDLE_TIMEOUT: 15
+  #    ENFORCE_WHITELIST: "true"
+  #    WHITELIST: ${USER_WHITELIST}
+  #    ONLINE_MODE: "true"
+  #    #http_proxy: "http://proxy.yourdomain.local:3128"
+  #    #https_proxy: "http://proxy.yourdomain.local:3128"
+  #  ports:
+  #    - target: 19132
+  #      published: 19132
+  #      protocol: udp
+  #      mode: host
+  #  networks:
+  #    - local
+  #  volumes:
+  #    - normal:/data
+  #  deploy:
+  #    mode: replicated
+  #    replicas: 1
+  #    update_config:
+  #      parallelism: 1
+  #      delay: 5s
+  #      order: stop-first
+  #      failure_action: rollback
+  #    rollback_config:
+  #      order: stop-first
+  #    restart_policy:
+  #      condition: any
+  #    placement:
+  #      constraints:
+  #        - node.labels.minecraft == data
+  
+  #ava:
+  # image: itzg/minecraft-server
+  # environment:
+  #   #https://minecraft.wiki/w/Server.properties#Option_keys
+  #   EULA: "true"
+  #   TZ: "Europe/Berlin"
+  #   MOTD: "Willkommen in FreundeLand"
+  #   LEVEL_NAME: "GruenesTal"
+  #   LEVEL_SEED: "-7648232739738869036"
+  #   GAMEMODE: "survival"
+  #   DIFFICULTY: "normal"
+  #   VIEW_DISTANCE: 10
+  #   PLAYER_IDLE_TIMEOUT: 15
+  #   ENFORCE_WHITELIST: "true"
+  #   WHITE_LIST: "true"
+  #   ONLINE_MODE: "true"
+  #   ENABLE_RCON: "true"
+  #   RCON_PASSWORD: ${RCON_PASS}
+  #   RCON_PORT: "25575"
+  #   VERSION: "1.20.1"
+  #   TYPE: "FORGE"
+  # ports:
+  #   - target: 25565
+  #     published: 25565
+  #     protocol: udp
+  #     mode: host
+  #   - target: 25575
+  #     published: 25575
+  #     protocol: tcp
+  #     mode: host
+  # networks:
+  #   - local
+  # volumes:
+  #   - java:/data
+  # deploy:
+  #   mode: replicated
+  #   replicas: 1
+  #   update_config:
+  #     parallelism: 1
+  #     delay: 5s
+  #     order: stop-first
+  #     failure_action: rollback
+  #   rollback_config:
+  #     order: stop-first
+  #   restart_policy:
+  #     condition: any
+  #   placement:
+  #     constraints:
+  #       - node.labels.minecraft == data
 
 volumes:
-  normal:
-    name: minecraft-normal-data
+  #normal:
+  #  name: minecraft-normal-data
+  #  driver: local
+  #java:
+  #  name: minecraft-normal-java
+  #  driver: local
+  crafty-backups:
     driver: local
-  java:
-    name: minecraft-normal-java
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/minecraft/crafty/backups"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  crafty-servers:
     driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/minecraft/crafty/servers"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  crafty-config:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/minecraft/crafty/config"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  crafty-import:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/minecraft/crafty/import"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
+  crafty-logs:
+    driver: local
+    driver_opts:
+      type: nfs
+      device: ":/nfs_share/minecraft/crafty/logs"
+      o: "addr=10.0.0.3,rw,soft,nfsvers=4"
 
 networks:
   local:
@@ -131,3 +212,5 @@ networks:
     ipam:
       config:
         - subnet: 172.30.16.0/24
+  traefik:
+    external: true
