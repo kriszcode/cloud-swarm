@@ -17,6 +17,11 @@
           "certResolver": "letsencrypt"
         }
       }
+    },
+    "serversTransports":{
+        "crafty":{
+            "insecureSkipVerify": true
+        }
     }
   }
 }
