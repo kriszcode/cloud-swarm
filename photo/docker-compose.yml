@@ -36,7 +36,7 @@ x-api-deploy: &api-deployment
 
 services:
   immich:
-    image: ghcr.io/immich-app/immich-server:v1.138.1
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-v1.138.1}
     networks:
       - local
       - traefik
@@ -79,7 +79,7 @@ services:
         traefik.http.services.immich.loadbalancer.server.port: "2283"
 
   machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v1.138.1
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-v1.138.1}
     networks:
       - local
       - public
