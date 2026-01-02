@@ -115,6 +115,7 @@ services:
     image: databasus/databasus:v2.19.1
     networks:
       - database
+      - traefik
     volumes:
       - databasus:/databasus-data
     deploy:
