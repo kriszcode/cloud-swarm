@@ -127,6 +127,10 @@ services:
 
   databasus:
     image: databasus/databasus:v2.19.1
+    environment:
+      - HTTP_PROXY=http://database-proxy:3128
+      - HTTPS_PROXY=http://database-proxy:3128
+      - NO_PROXY=localhost,127.0.0.1,172.30.13.0/24,database_postgres,database_mariadb
     networks:
       - database
       - traefik
