@@ -113,6 +113,7 @@ services:
 
   databasus:
     image: databasus/databasus:v2.19.1
+    user: "1000:1000"
     networks:
       - database
     volumes:
