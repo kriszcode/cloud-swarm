@@ -113,7 +113,6 @@ services:
 
   databasus:
     image: databasus/databasus:v2.19.1
-    user: "1000:1000"
     networks:
       - database
     volumes:
@@ -157,8 +156,6 @@ volumes:
       type: nfs
       device: ":/nfs_share/database/databasus"
       o: "addr=10.0.0.3,rw,soft,nfsvers=4"
-    labels:
-      com.docker.volume.nocopy: "true"
 
 
 secrets:
