@@ -68,7 +68,7 @@ services:
         target: /usr/src/app/config.json
         uid: '1000'
         gid: '1000'
-        mode: 0400
+        mode: 0444
     networks:
       - local
       - public
