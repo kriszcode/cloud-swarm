@@ -71,6 +71,7 @@ services:
         mode: 0400
     networks:
       - local
+      - public
     deploy:
       replicas: 1
       <<: *api-deployment
