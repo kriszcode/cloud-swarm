@@ -57,6 +57,8 @@ services:
       - data:/data
       - thumbnail:/data/thumbs
       - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "2283:2283"
     deploy:
       replicas: 1
       <<: *api-deployment
