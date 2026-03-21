@@ -23,7 +23,7 @@ x-api-deploy: &api-deployment
 services:
   crafty:
     container_name: crafty_container
-    image: arcadiatechnology/crafty-4:4.7.0
+    image: registry.gitlab.com/crafty-controller/crafty-4:${CRAFTY_VERSION:-4.10.2}
     environment:
       - TZ=Europe/Berlin
       - HTTP_PROXY=http://minecraft-proxy:3128
@@ -103,101 +103,6 @@ services:
     deploy:
       replicas: 1
       <<: *api-deployment
-
-  #https://github.com/itzg/docker-minecraft-bedrock-server
-  #normal:
-  #  image: itzg/minecraft-bedrock-server
-  #  environment:
-  #    #https://minecraft.wiki/w/Server.properties#Option_keys
-  #    EULA: "true"
-  #    TZ: "Europe/Berlin"
-  #    SERVER_NAME: "FreundeLand"
-  #    GAMEMODE: "survival"
-  #    DIFFICULTY: "normal"
-  #    #Craftopia
-  #    LEVEL_NAME: "GrünesTal"
-  #    LEVEL_SEED: "-7648232739738869036"
-  #    VIEW_DISTANCE: 10
-  #    PLAYER_IDLE_TIMEOUT: 15
-  #    ENFORCE_WHITELIST: "true"
-  #    WHITELIST: ${USER_WHITELIST}
-  #    ONLINE_MODE: "true"
-  #    #http_proxy: "http://proxy.yourdomain.local:3128"
-  #    #https_proxy: "http://proxy.yourdomain.local:3128"
-  #  ports:
-  #    - target: 19132
-  #      published: 19132
-  #      protocol: udp
-  #      mode: host
-  #  networks:
-  #    - local
-  #  volumes:
-  #    - normal:/data
-  #  deploy:
-  #    mode: replicated
-  #    replicas: 1
-  #    update_config:
-  #      parallelism: 1
-  #      delay: 5s
-  #      order: stop-first
-  #      failure_action: rollback
-  #    rollback_config:
-  #      order: stop-first
-  #    restart_policy:
-  #      condition: any
-  #    placement:
-  #      constraints:
-  #        - node.labels.minecraft == data
-  
-  #ava:
-  # image: itzg/minecraft-server
-  # environment:
-  #   #https://minecraft.wiki/w/Server.properties#Option_keys
-  #   EULA: "true"
-  #   TZ: "Europe/Berlin"
-  #   MOTD: "Willkommen in FreundeLand"
-  #   LEVEL_NAME: "GruenesTal"
-  #   LEVEL_SEED: "-7648232739738869036"
-  #   GAMEMODE: "survival"
-  #   DIFFICULTY: "normal"
-  #   VIEW_DISTANCE: 10
-  #   PLAYER_IDLE_TIMEOUT: 15
-  #   ENFORCE_WHITELIST: "true"
-  #   WHITE_LIST: "true"
-  #   ONLINE_MODE: "true"
-  #   ENABLE_RCON: "true"
-  #   RCON_PASSWORD: ${RCON_PASS}
-  #   RCON_PORT: "25575"
-  #   VERSION: "1.20.1"
-  #   TYPE: "FORGE"
-  # ports:
-  #   - target: 25565
-  #     published: 25565
-  #     protocol: udp
-  #     mode: host
-  #   - target: 25575
-  #     published: 25575
-  #     protocol: tcp
-  #     mode: host
-  # networks:
-  #   - local
-  # volumes:
-  #   - java:/data
-  # deploy:
-  #   mode: replicated
-  #   replicas: 1
-  #   update_config:
-  #     parallelism: 1
-  #     delay: 5s
-  #     order: stop-first
-  #     failure_action: rollback
-  #   rollback_config:
-  #     order: stop-first
-  #   restart_policy:
-  #     condition: any
-  #   placement:
-  #     constraints:
-  #       - node.labels.minecraft == data
 
 volumes:
   #normal:
